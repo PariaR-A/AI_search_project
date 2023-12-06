@@ -57,7 +57,7 @@ def successor(current_state, grid):
         if 0 <= new_row < len(grid) and 0 <= new_col < len(grid[0]):
             new_position = (new_row, new_col)
             cell_value = grid[new_row][new_col]
-            if cell_value != 'X':  # '#' represents an obstacle, adjust according to your grid setup
+            if cell_value != 'X':  # 'X' represents an obstacl so no miving there
                 new_energy = current_energy
                 if cell_value.isdigit():  # Check if the cell value is a digit (cost)
                     cell_cost = int(cell_value)
@@ -75,7 +75,7 @@ def successor(current_state, grid):
                         reward = 5
                     elif word == 'I':  # Reward: I gives 12 energy
                         reward = 12
-                    elif word == 'T':  # Target position, no energy change
+                    elif word == 'T' or word == 'R':  # Target and start position, no energy change
                         reward =0
                     
                     cell_cost = int(digit) - reward
