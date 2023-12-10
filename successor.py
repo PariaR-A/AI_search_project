@@ -1,19 +1,25 @@
 import re
 
+class Node:
+    def __init__(self, parents, cell_cost, position, remaining_energy):
+        self.parents = parents
+        self.cell_cost = cell_cost
+        self.position = position
+        self.remaining_energy = remaining_energy
+
+
 #getting the input
-x , y = map(int, input().split())
+x, y = map(int, input().split())
 matrix = []
 #preparing the matrix
 for i in range(x):
     value = list(input().split())
     matrix.append(value)
-#our defualt energy
+#our default energy
 energy = 500
 
-
-#our matrix value might be combination of letters and digits so we might need this to make it
+#our matrix value might be combination of letters and digits so we might need this to parse it
 def extract_digit_and_word(string):
-    # Use regex to find the digit and word parts
     match = re.match(r"(\d+)(\w+)", string)
     
     if match:
@@ -23,31 +29,25 @@ def extract_digit_and_word(string):
     else:
         return None, None
     
-#we should find our starting point to traverse
-def find_starting_point(grid,energy):
+#find our starting point to traverse
+def find_starting_point(grid, energy):
     for row_idx, row in enumerate(grid):
         for col_idx, cell_value in enumerate(row):
-            digit , word = extract_digit_and_word(cell_value)
-            if (word == 'R'):
+            digit, word = extract_digit_and_word(cell_value)
+            if word == 'R':
                 energy -= int(digit)
                 position = (row_idx, col_idx)
-                return (position , energy)
-            
-                
+                return Node([], 0, position, energy)
             
     return None  # Return None if starting point not found
 
 
-
-
-    
-    
 def successor(current_state, grid):
     successors = []
     moves = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # Possible moves: right, left, down, up
-    position = current_state[0]
-    current_energy = current_state[1]
-    current_row, current_col= position
+    position = current_state.position
+    current_energy = current_state.remaining_energy
+    current_row, current_col = position
 
     for move in moves:
         new_row = current_row + move[0]
@@ -57,38 +57,42 @@ def successor(current_state, grid):
         if 0 <= new_row < len(grid) and 0 <= new_col < len(grid[0]):
             new_position = (new_row, new_col)
             cell_value = grid[new_row][new_col]
-            if cell_value != 'X':  # 'X' represents an obstacl so no miving there
+            if cell_value != 'X':  # 'X' represents an obstacle, so no moving there
                 new_energy = current_energy
                 if cell_value.isdigit():  # Check if the cell value is a digit (cost)
                     cell_cost = int(cell_value)
                 
                     if cell_cost <= current_energy:  # Check if the energy is sufficient to move to the new position
                         new_energy = current_energy - cell_cost
-                        successors.append((new_position, new_energy))
+                        successor_node = Node(current_state, cell_cost, new_position, new_energy)
+                        successors.append(successor_node)
                 else:
                     reward = 0
-                    digit , word = extract_digit_and_word(cell_value)
+                    digit, word = extract_digit_and_word(cell_value)
                     if word == 'C':  # Reward: C gives 10 energy
                         reward = 10
-                    
                     elif word == 'B':  # Reward: B gives 5 energy
                         reward = 5
                     elif word == 'I':  # Reward: I gives 12 energy
                         reward = 12
                     elif word == 'T' or word == 'R':  # Target and start position, no energy change
-                        reward =0
+                        reward = 0
                     
                     cell_cost = int(digit) - reward
                     
                     if cell_cost <= current_energy:  # Check if the energy is sufficient to move to the new position
                         new_energy = current_energy - cell_cost
-                        successors.append((new_position, new_energy))
+                        successor_node = Node(current_state, cell_cost, new_position, new_energy)
+                        successors.append(successor_node)
 
     return successors
 
 start = find_starting_point(matrix, energy)
+successors = successor(start, matrix)
 
-print(successor(start, matrix))
-
-
-#this comment exist for the sole purpose of git 
+for s in successors:
+    print("Parents:", s.parents.position if s.parents else "None")
+    print("Cell Cost:", s.cell_cost)
+    print("Position:", s.position)
+    print("Remaining Energy:", s.remaining_energy)
+    print()
