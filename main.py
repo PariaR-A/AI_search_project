@@ -1,7 +1,7 @@
+from dfs import dfs
 from Direction import Direction
 from Node import Node
 from helper_functions import extract_digit_and_word
-from successor import successor
 
 def get_input():
     """
@@ -41,10 +41,12 @@ def find_starting_point(grid, energy):
 if __name__ == "__main__":
     matrix, const_energy, target_n = get_input()
     start = find_starting_point(matrix, const_energy)
-    successors = successor(start, matrix)
-    for s in successors:
-        print("Parents:", s.parents.position if s.parents else "None")
-        print("Cell Cost:", s.cell_cost)
-        print("Position:", s.position)
-        print("Remaining Energy:", s.remaining_energy)
-        print()
+
+    # for s in successors:
+    #     print("Parents:", s.parents.position if s.parents else "None")
+    #     print("Cell Cost:", s.cell_cost)
+    #     print("Position:", s.position)
+    #     print("Remaining Energy:", s.remaining_energy)
+    #     print()
+
+    dfs(matrix, start, target_n)
