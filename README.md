@@ -7,7 +7,7 @@
 
 
 **Second Phase - Blind Search:**
-- [ ] BFS
+- [x] BFS
 - [x] DFS
 - [ ] IDS
 - [ ] UCS
